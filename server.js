@@ -36,35 +36,31 @@ fastify.get("/test-db", async (request, reply) => {
         const connectionState = mongoose.connection.readyState
 
         let status = ""
+
         switch (connectionState) {
             case 0:
-                status: "disconnected"
-                break;
+                status = "disconnected"
+                break
             case 1:
-                status: "connected"
-                break;
+                status = "connected"
+                break
             case 2:
-                status: "connecting"
-                break;
+                status = "connecting"
+                break
             case 3:
-                status: "disconnecting"
-                break;
-
+                status = "disconnecting"
+                break
             default:
-                status: "unknown"
-                break;
+                status = "unknown"
         }
 
-        reply.send({database: status})
+        reply.send({ database: status })
 
-
-    } catch (error) {
+    } catch (err) {
         fastify.log.error(err)
         reply.status(500).send({ error: "Failed to test database" })
-        process.exit(1)
     }
 })
-
 
 
 
