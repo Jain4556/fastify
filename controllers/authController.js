@@ -13,7 +13,7 @@ exports.register = async (request, reply) => {
         const hashedPassword = await bcrypt.hash(password, 10)
         const user = new User({ name, email, password: hashedPassword })
         await user.save()
-        reply.code(201).send({ "message: user registered successfully"})
+        reply.code(201).send({ message: "user registered successfully"})
 
     } catch (error) {
         reply.send(err)
