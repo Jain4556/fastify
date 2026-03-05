@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const fastify = require("fastify")({ logger: true })
 const fastifyEnv = require("@fastify/env")
+const { default: mongoose } = require('mongoose')
 fastify.register(require("@fastify/sensible"))
 fastify.register(require("@fastify/cors"))
 
@@ -18,9 +19,54 @@ fastify.register(fastifyEnv, {
     }
 })
 
+// register custom column()
+fastify.register(require("./plugins/mongodb"))
+
+
+// declare a route
 fastify.get('/', async (request, reply) => {
     return { hello: "world" }
 })
+
+
+// test database connection
+fastify.get("/test-db", async (request, reply) => {
+    try {
+        const mongoose = fastify.mongoose
+        const connectionState = mongoose.connection.readyState
+
+        let status = ""
+        switch (connectionState) {
+            case 0:
+                status: "disconnected"
+                break;
+            case 1:
+                status: "connected"
+                break;
+            case 2:
+                status: "connecting"
+                break;
+            case 3:
+                status: "disconnecting"
+                break;
+
+            default:
+                status: "unknown"
+                break;
+        }
+
+        reply.send({database: status})
+
+
+    } catch (error) {
+        fastify.log.error(err)
+        reply.status(500).send({ error: "Failed to test database" })
+        process.exit(1)
+    }
+})
+
+
+
 
 const start = async () => {
     try {
