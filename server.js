@@ -21,6 +21,11 @@ fastify.register(fastifyEnv, {
 
 // register custom column()
 fastify.register(require("./plugins/mongodb"))
+fastify.register(require("./plugins/jwt"))
+
+// register routes
+fastify.register(require("./routes/auth"), {prefix: "/api/auth"})
+
 
 
 // declare a route
