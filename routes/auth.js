@@ -8,11 +8,8 @@ module.exports = async function (fastify, opts) {
     fastify.post(
         "/logout ",
         { preHandler: [fastify.authenticate] },
-        authController.resetPassword
+        authController.logout
 
     )
-
-
-
 }
 
