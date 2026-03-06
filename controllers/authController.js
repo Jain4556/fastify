@@ -1,7 +1,7 @@
 const User = require("../models/user.js")
 const crypto = require("crypto")
 const bcrypt = require("bcryptjs")
-const { request } = require("http")
+
 
 
 exports.register = async (request, reply) => {
@@ -13,9 +13,9 @@ exports.register = async (request, reply) => {
         const hashedPassword = await bcrypt.hash(password, 10)
         const user = new User({ name, email, password: hashedPassword })
         await user.save()
-        reply.code(201).send({ message: "user registered successfully"})
+        reply.code(201).send({ message: "user registered successfully" })
 
-    } catch (error) {
+    } catch (err) {
         reply.send(err)
     }
 }
@@ -27,7 +27,7 @@ exports.login = async (request, reply) => {
         const { email, password } = request.body
         const user = await User.findOne({ email })
         if (!user) {
-            return reply.code(400).send({ message: "Invalid email or ppassowd" })
+            return reply.code(400).send({ message: "Invalid email or password" })
         }
 
         // validate the password
@@ -78,37 +78,37 @@ exports.forgotPassword = async (request, reply) => {
 
 
 exports.resetPassword = async (request, reply) => {
-    const resetToken = request.params.token
-    const { newPassword } = request.body
+    try {
+        const resetToken = request.params.token
+        const { newPassword } = request.body
 
-    const user = await User.findOne({
-        resetPasswordToken: resetToken,
-        resetPasswordExpiry: { $gt: Date.now() },
+        const user = await User.findOne({
+            resetPasswordToken: resetToken,
+            resetPasswordExpiry: { $gt: Date.now() },
+        })
 
-    })
+        if (!user) {
+            return reply.badRequest("Invalid or expired password reset token")
+        }
 
-    if (!user) {
-        return reply.badRequest("Invalid or expired password resest token")
+        const hashedPassword = await bcrypt.hash(newPassword, 12)
 
+        user.password = hashedPassword
+        user.resetPasswordToken = undefined
+        user.resetPasswordExpiry = undefined
 
+        await user.save()
+
+        reply.send({ message: "password reset successfully" })
+
+    } catch (err) {
+        reply.send(err)
     }
-
-
-    // hash the password 
-    const hashhedPassword = await bcrypt.hash(newPassword, 12)
-    user.password = hashedPassword
-    user.resetPasswordToken = undefined
-    user.resetPasswordExpiry = undefined
-
-    await user.save()
-
-    reply.send({ message: "password reset successfully" })
-
 }
 
 
-exports.logout = async(request, reply) => {
+exports.logout = async (request, reply) => {
     // JWT are stateless, strategy liek refresh token or blaclist
 
-    reply.send({message: "User logged out"})
+    reply.send({ message: "User logged out" })
 }

@@ -79,4 +79,8 @@ const start = async () => {
     }
 }
 
+fastify.ready(() => {
+  console.log(fastify.printRoutes())
+})
+
 start()
