@@ -1,12 +1,17 @@
 require('dotenv').config()
 
 const fastify = require("fastify")({ logger: true })
-const fastifyEnv = require("@fastify/env")
+const fastifyenv = require("@fastify/env")
 const { default: mongoose } = require('mongoose')
 fastify.register(require("@fastify/sensible"))
+fastify.register(require("@fastify/multipart"))
+fastify.register(require("@fastify/static", {
+    root: path.join(__dirname, "uploads"),
+    prefix: '/uploads/', // optional: default '/'
+}))
 fastify.register(require("@fastify/cors"))
 
-fastify.register(fastifyEnv, {
+fastify.register(fastifyenv, {
     dotenv: true,
     schema: {
         type: "object",
@@ -24,7 +29,7 @@ fastify.register(require("./plugins/mongodb"))
 fastify.register(require("./plugins/jwt"))
 
 // register routes
-fastify.register(require("./routes/auth"), {prefix: "/api/auth"})
+fastify.register(require("./routes/auth"), { prefix: "/api/auth" })
 
 
 
@@ -80,7 +85,7 @@ const start = async () => {
 }
 
 fastify.ready(() => {
-  console.log(fastify.printRoutes())
+    console.log(fastify.printRoutes())
 })
 
 start()
