@@ -38,7 +38,6 @@ exports.login = async (request, reply) => {
         }
 
         const token = request.server.jwt.sign({ id: user._id })
-
         reply.send({ token });
 
 
@@ -74,7 +73,6 @@ exports.forgotPassword = async (request, reply) => {
     }
 
 }
-
 
 
 exports.resetPassword = async (request, reply) => {
